@@ -8,6 +8,7 @@ import com.prachi18.college_management_system.Entities.Professor;
 import com.prachi18.college_management_system.Entities.Student;
 import com.prachi18.college_management_system.Entities.Subject;
 import com.prachi18.college_management_system.Exceptions.ResourceNotFoundException;
+import com.prachi18.college_management_system.Exceptions.StudentAlreadyEnrolledException;
 import com.prachi18.college_management_system.Repositories.DepartmentRepository;
 import com.prachi18.college_management_system.Repositories.ProfessorRepository;
 import com.prachi18.college_management_system.Repositories.StudentRepository;
@@ -88,7 +89,9 @@ public class StudentService {
                 .orElseThrow(()->new ResourceNotFoundException("Student not found with id: " + studentId));
         Subject subject= subjectRepository.findById(subjectId)
                 .orElseThrow(()->new ResourceNotFoundException("Subject not found with id: " + subjectId));
-
+        if(student.getSubjects().contains(subject)) {
+            throw new StudentAlreadyEnrolledException("Student is already enrolled in this subject");
+        }
         student.getSubjects().add(subject);
         studentRepository.save(student);
     }

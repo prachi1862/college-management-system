@@ -7,6 +7,7 @@ import com.prachi18.college_management_system.Entities.Professor;
 import com.prachi18.college_management_system.Entities.Subject;
 import com.prachi18.college_management_system.Services.ProfessorService;
 import com.prachi18.college_management_system.Services.SubjectService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -19,26 +20,31 @@ import java.util.List;
 public class SubjectController {
     private final SubjectService subjectService;
 
+    @Operation(summary = "save a new subject")
     @PostMapping
     public SubjectResponseDTO save(@Valid @RequestBody SubjectRequestDTO dto) {
         return subjectService.createSubject(dto);
     }
 
+    @Operation(summary = "get subject by id")
     @GetMapping("/{id}")
     public SubjectResponseDTO getSubjectById(@PathVariable Long id){
         return subjectService.getSubjectById(id);
     }
 
+    @Operation(summary = "get all subjects")
     @GetMapping
     public List<SubjectResponseDTO> getAllSubjects(){
         return subjectService.getAllSubjects();
     }
 
+    @Operation(summary = "delete subject by id")
     @DeleteMapping("/{id}")
     public void deleteSubjectById(@PathVariable Long id){
         subjectService.deleteSubjectById(id);
     }
 
+    @Operation(summary = "get all students enrolled in a subject")
     @GetMapping("/{id}/students")
     public List<StudentResponseDTO> getStudentsBySubjectId(@PathVariable Long id){
       return subjectService.getStudentsBySubjectId(id);

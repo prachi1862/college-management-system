@@ -33,6 +33,15 @@ public class GlobalExceptionHandler {
             return buildApiResponse(apiError);
     }
 
+    @ExceptionHandler(StudentAlreadyEnrolledException.class)
+    public ResponseEntity<ApiResponse<?>> hanldeStudentAlreadyEnrolledException(StudentAlreadyEnrolledException e) {
+        ApiError apiError = ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .message(e.getMessage())
+                .build();
+        return buildApiResponse(apiError);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<?>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         List<String> errors= e
