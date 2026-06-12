@@ -52,6 +52,7 @@ The project focuses on building REST APIs with proper layering, database relatio
 - Swagger API documentation
 - Pagination and sorting support
 - DTO-based request and response handling
+- 
 - Search APIs using custom repository methods
 - Custom JPQL queries for advanced data retrieval
 - Audit fields for entity creation and update tracking
@@ -84,7 +85,7 @@ http://localhost:8080/swagger-ui/index.html
 
 ### Student APIs
 
-![Student APIs](screenshots/student-api.png)
+![Student APIs](screenshots/swagger-api.png)
 
 ----
 ## How to Run the Project
