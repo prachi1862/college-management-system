@@ -4,21 +4,20 @@ import com.prachi18.college_management_system.DTO.StudentRequestDTO;
 import com.prachi18.college_management_system.DTO.StudentResponseDTO;
 import com.prachi18.college_management_system.DTO.SubjectResponseDTO;
 import com.prachi18.college_management_system.Entities.Department;
-import com.prachi18.college_management_system.Entities.Professor;
 import com.prachi18.college_management_system.Entities.Student;
 import com.prachi18.college_management_system.Entities.Subject;
 import com.prachi18.college_management_system.Exceptions.ResourceNotFoundException;
 import com.prachi18.college_management_system.Exceptions.StudentAlreadyEnrolledException;
 import com.prachi18.college_management_system.Repositories.DepartmentRepository;
-import com.prachi18.college_management_system.Repositories.ProfessorRepository;
 import com.prachi18.college_management_system.Repositories.StudentRepository;
 import com.prachi18.college_management_system.Repositories.SubjectRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -58,8 +57,8 @@ public class StudentService {
     }
 
     @Transactional
-    public List<StudentResponseDTO> getAllStudents() {
-        List<Student> students = studentRepository.findAll();
+    public List<StudentResponseDTO> getAllStudents(Pageable pageable) {
+        List<Student> students = studentRepository.findAll(pageable).getContent();
         return students.stream()
                 .map(this::mapToResponse)
                 .toList();

@@ -11,7 +11,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +25,7 @@ import java.util.List;
 public class StudentController {
     @Autowired
     StudentService studentService;
+    private static final int PAGE_SIZE=5;
 
     @Operation(summary = "add a new student")
     @PostMapping
@@ -37,8 +41,10 @@ public class StudentController {
 
     @Operation(summary = "get all students")
     @GetMapping
-    public List<StudentResponseDTO> getAllStudents(){
-        return studentService.getAllStudents();
+    public List<StudentResponseDTO> getAllStudents(@RequestParam(defaultValue = "id") String sortBy,
+                                                   @RequestParam (defaultValue ="0") int page){
+        Pageable pageable= PageRequest.of(page,PAGE_SIZE, Sort.by(Sort.Direction.ASC, sortBy));
+        return studentService.getAllStudents(pageable);
     }
 
     @Operation(summary = "delete student by id")

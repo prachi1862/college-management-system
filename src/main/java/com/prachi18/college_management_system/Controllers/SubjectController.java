@@ -3,13 +3,13 @@ package com.prachi18.college_management_system.Controllers;
 import com.prachi18.college_management_system.DTO.StudentResponseDTO;
 import com.prachi18.college_management_system.DTO.SubjectRequestDTO;
 import com.prachi18.college_management_system.DTO.SubjectResponseDTO;
-import com.prachi18.college_management_system.Entities.Professor;
-import com.prachi18.college_management_system.Entities.Subject;
-import com.prachi18.college_management_system.Services.ProfessorService;
 import com.prachi18.college_management_system.Services.SubjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.List;
 @RequestMapping("/subject")
 public class SubjectController {
     private final SubjectService subjectService;
-
+    private static int PAGE_SIZE = 10;
     @Operation(summary = "save a new subject")
     @PostMapping
     public SubjectResponseDTO save(@Valid @RequestBody SubjectRequestDTO dto) {
@@ -34,8 +34,10 @@ public class SubjectController {
 
     @Operation(summary = "get all subjects")
     @GetMapping
-    public List<SubjectResponseDTO> getAllSubjects(){
-        return subjectService.getAllSubjects();
+    public List<SubjectResponseDTO> getAllSubjects(@RequestParam(defaultValue = "id") String sortBy,
+                                                   @RequestParam(defaultValue = "0") int page){
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE,  Sort.by(Sort.Direction.ASC, sortBy));
+        return subjectService.getAllSubjects(pageable);
     }
 
     @Operation(summary = "delete subject by id")

@@ -6,6 +6,9 @@ import com.prachi18.college_management_system.Services.AdmissionRecordService;
 import com.prachi18.college_management_system.Services.ProfessorService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,7 +18,7 @@ import java.util.List;
 @RequestMapping(path="/admissionRecord")
 public class AdmissionRecordController {
     private final AdmissionRecordService admissionRecordService;
-
+    private static int PAGE_SIZE = 10;
     @Operation(summary = "create a new admission record")
     @PostMapping
     public AdmissionRecord createAdmissionRecord(@RequestBody AdmissionRecord admissionRecord) {
@@ -30,8 +33,10 @@ public class AdmissionRecordController {
 
     @Operation(summary = "get all admission records")
     @GetMapping
-    public List<AdmissionRecord> getAllAdmissionRecords(){
-        return admissionRecordService.getAllAdmissionRecords();
+    public List<AdmissionRecord> getAllAdmissionRecords(@RequestParam(defaultValue = "id") String sortBy,
+                                                        @RequestParam(defaultValue = "0") int page){
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE,  Sort.by(Sort.Direction.ASC, sortBy));
+        return admissionRecordService.getAllAdmissionRecords(pageable);
     }
 
     @Operation(summary = "delete admission record by id")

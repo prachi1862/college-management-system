@@ -6,6 +6,7 @@ import com.prachi18.college_management_system.Repositories.AdmissionRecordReposi
 import com.prachi18.college_management_system.Repositories.ProfessorRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,8 +27,8 @@ public class AdmissionRecordService {
     }
 
     @Transactional
-    public List<AdmissionRecord> getAllAdmissionRecords() {
-        return admissionRecordRepository.findAll();
+    public List<AdmissionRecord> getAllAdmissionRecords(Pageable pageable) {
+        return admissionRecordRepository.findAll(pageable).getContent();
     }
 
     @Transactional

@@ -10,6 +10,7 @@ import com.prachi18.college_management_system.Repositories.ProfessorRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,8 +51,8 @@ public class ProfessorService {
     }
 
     @Transactional
-    public List<ProfessorResponseDTO> getAllProfessors() {
-        List<Professor> professors= professorRepository.findAll();
+    public List<ProfessorResponseDTO> getAllProfessors(Pageable pageable) {
+        List<Professor> professors= professorRepository.findAll(pageable).getContent();
         return professors.stream()
                 .map(this::mapToResponseDTO)
                 .toList();

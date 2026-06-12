@@ -8,6 +8,7 @@ import com.prachi18.college_management_system.Repositories.DepartmentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -45,8 +46,8 @@ public class DepartmentService {
     }
 
     @Transactional
-    public List<DepartmentResponseDTO> getAllDepartments(){
-         List<Department> departments= departmentRepository.findAll();
+    public List<DepartmentResponseDTO> getAllDepartments(Pageable pageable) {
+         List<Department> departments= departmentRepository.findAll(pageable).getContent();
          return departments.stream()
                  .map(this::mapToResponse)
                  .toList();

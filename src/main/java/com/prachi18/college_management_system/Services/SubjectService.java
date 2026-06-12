@@ -8,16 +8,15 @@ import com.prachi18.college_management_system.Entities.Student;
 import com.prachi18.college_management_system.Entities.Subject;
 import com.prachi18.college_management_system.Exceptions.ResourceNotFoundException;
 import com.prachi18.college_management_system.Repositories.ProfessorRepository;
-import com.prachi18.college_management_system.Repositories.StudentRepository;
 import com.prachi18.college_management_system.Repositories.SubjectRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -55,8 +54,8 @@ public class SubjectService {
     }
 
     @Transactional
-    public List<SubjectResponseDTO> getAllSubjects() {
-        List<Subject> subjects= subjectRepository.findAll();
+    public List<SubjectResponseDTO> getAllSubjects(Pageable pageable) {
+        List<Subject> subjects= subjectRepository.findAll(pageable).getContent();
         return subjects.stream()
                 .map(this::mapToResponseDTO)
                 .toList();

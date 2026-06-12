@@ -10,7 +10,7 @@ import lombok.*;
 public class DepartmentResponseDTO {
     private Long id;
     private String departmentName;
-    private String departmentCode;
+    private String deptCode;
     private String hodName;
     private Integer studentCount;
     private Integer professorCount;

@@ -8,6 +8,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +21,7 @@ import java.util.List;
 public class DepartmentController {
 
     private final DepartmentService departmentService;
+    private static int PAGE_SIZE = 10;
 
     @Operation(summary = "create a new department")
     @PostMapping
@@ -46,8 +50,10 @@ public class DepartmentController {
 
     @Operation(summary = "get all departments")
     @GetMapping
-    public List<DepartmentResponseDTO> getAllDepartments(){
-        return departmentService.getAllDepartments();
+    public List<DepartmentResponseDTO> getAllDepartments(@RequestParam(defaultValue ="id") String sortBy,
+                                                         @RequestParam(defaultValue ="0") int page){
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by(Sort.Direction.ASC, sortBy));
+        return departmentService.getAllDepartments(pageable);
     }
 
     @Operation(summary = "partially update department")

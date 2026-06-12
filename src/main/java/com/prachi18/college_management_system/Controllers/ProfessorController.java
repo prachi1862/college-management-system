@@ -7,6 +7,9 @@ import com.prachi18.college_management_system.Services.ProfessorService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +19,7 @@ import java.util.List;
 @RequestMapping(path="/prof")
 public class ProfessorController {
     private final ProfessorService professorService;
+    private static int PAGE_SIZE = 10;
 
     @Operation(summary = "create a new professor")
     @PostMapping
@@ -31,8 +35,10 @@ public class ProfessorController {
 
     @Operation(summary = "get all professors")
     @GetMapping
-    public List<ProfessorResponseDTO> getAllProfessors(){
-        return professorService.getAllProfessors();
+    public List<ProfessorResponseDTO> getAllProfessors(@RequestParam(defaultValue = "id") String sortBy,
+                                                       @RequestParam(defaultValue = "0") int page){
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE,  Sort.by(Sort.Direction.ASC, sortBy));
+        return professorService.getAllProfessors(pageable);
     }
 
     @Operation(summary = "delete professor by id")
