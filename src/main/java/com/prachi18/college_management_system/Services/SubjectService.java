@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -79,11 +80,32 @@ public class SubjectService {
                             StudentResponseDTO dto= modelMapper.map(student, StudentResponseDTO.class);
 
                             if(student.getDepartment()!=null){
-                                dto.setDepartmentName(student.getDepartment().getName());
+                                dto.setDepartmentName(student.getDepartment().getDepartmentName());
                             }
                             return dto;
                         }
                 )
+                .toList();
+    }
+
+    @Transactional
+    public List<SubjectResponseDTO> findBySubjectNameContainingIgnoreCase(String subjectName) {
+        List<Subject> subjects= subjectRepository.findBySubjectNameContainingIgnoreCase(subjectName);
+        if(subjects.isEmpty()){ throw new ResourceNotFoundException("Subject with name "+subjectName+" not found");}
+        return subjects.stream()
+                .map(this::mapToResponseDTO)
+                .toList();
+    }
+
+    @Transactional
+    public List<SubjectResponseDTO> findByProfessorId(Long professorId){
+        Professor professor= professorRepository.findById(professorId)
+                .orElseThrow( ()->new ResourceNotFoundException("professor with id "+professorId+" not found"));
+
+        List<Subject> subjects= subjectRepository.findByProfessorId(professorId);
+        if(subjects.isEmpty()){ throw new  ResourceNotFoundException("Subject with professor id "+professorId+" not found");}
+        return  subjects.stream()
+                .map(this::mapToResponseDTO)
                 .toList();
     }
 }

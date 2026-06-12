@@ -46,4 +46,10 @@ public class ProfessorController {
     public void deleteProfessorById(@PathVariable Long id){
         professorService.deleteProfessorById(id);
     }
+
+    @Operation(summary = "find by professor name")
+    @GetMapping("/profName")
+    public List<ProfessorResponseDTO> findByProfName(@RequestParam String profName){
+        return professorService.findByProfNameContainingIgnoreCase(profName);
+    }
 }

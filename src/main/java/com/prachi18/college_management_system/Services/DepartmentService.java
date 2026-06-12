@@ -3,6 +3,7 @@ package com.prachi18.college_management_system.Services;
 import com.prachi18.college_management_system.DTO.DepartmentRequestDTO;
 import com.prachi18.college_management_system.DTO.DepartmentResponseDTO;
 import com.prachi18.college_management_system.Entities.Department;
+import com.prachi18.college_management_system.Entities.Student;
 import com.prachi18.college_management_system.Exceptions.ResourceNotFoundException;
 import com.prachi18.college_management_system.Repositories.DepartmentRepository;
 import jakarta.transaction.Transactional;
@@ -69,7 +70,7 @@ public class DepartmentService {
     public DepartmentResponseDTO updateDepartment(Long id , DepartmentRequestDTO dto){
         Department existingDepartment = departmentRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Department not found with id: " + id));
-        existingDepartment.setName(dto.getName());
+        existingDepartment.setDepartmentName(dto.getName());
         existingDepartment.setDeptCode(dto.getDeptCode());
         existingDepartment.setHodName(dto.getHodName());
         Department updatedDepartment= departmentRepository.save(existingDepartment);
@@ -82,7 +83,7 @@ public class DepartmentService {
                 .orElseThrow(()->new ResourceNotFoundException("Department not found with id: " + id));
 
         if(dto.getName() != null){
-            existingDepartment.setName(dto.getName());
+            existingDepartment.setDepartmentName(dto.getName());
         }
 
         if(dto.getDeptCode() != null){
@@ -96,4 +97,14 @@ public class DepartmentService {
         return mapToResponse(updateddepartment);
     }
 
+    @Transactional
+    public List<DepartmentResponseDTO> searchDepartmentByName(String departmentName){
+        List<Department> departments= departmentRepository.findByNameContainingIgnoreCase(departmentName);
+
+        if(departments.isEmpty()){throw new ResourceNotFoundException("Department not found with name: " + departmentName);}
+
+        return departments.stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
 }

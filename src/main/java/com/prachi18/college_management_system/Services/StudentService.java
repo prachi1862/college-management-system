@@ -32,7 +32,7 @@ public class StudentService {
         StudentResponseDTO dto= modelMapper.map(student,StudentResponseDTO.class);
         if (student.getDepartment() != null) {
             dto.setDepartmentName(
-                    student.getDepartment().getName()
+                    student.getDepartment().getDepartmentName()
             );
         }
         return dto;
@@ -113,5 +113,24 @@ public class StudentService {
                     return dto;
                 })
                 .toList();
+    }
+
+    @Transactional
+    public List<StudentResponseDTO> findByFirstNameContainingIgnoreCase(String firstName){
+         List<Student> students= studentRepository.findByFirstNameContainingIgnoreCase(firstName);
+
+         if(students.isEmpty()){throw new ResourceNotFoundException("Student not found with name: " + firstName);}
+
+         return students.stream()
+                     .map(this::mapToResponse)
+                     .toList();
+    }
+
+    @Transactional
+    public List<StudentResponseDTO> findByDepartmentId(Long departmentId){
+        Department department= departmentRepository.findById(departmentId)
+                .orElseThrow(()->new ResourceNotFoundException("Department not found with id: " + departmentId));
+        List<Student> students= studentRepository.findByDepartmentId(departmentId);
+        return students.stream().map(this::mapToResponse).toList();
     }
 }

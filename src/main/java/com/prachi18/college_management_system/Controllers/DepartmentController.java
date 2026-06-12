@@ -62,4 +62,10 @@ public class DepartmentController {
                                        @PathVariable Long id){
         return departmentService.patchDepartment(id,  dto);
     }
+
+    @Operation(summary = "find by department name")
+    @GetMapping("/departmentName")
+    public List<DepartmentResponseDTO> searchDepartment(@RequestParam String departmentName){
+        return departmentService.searchDepartmentByName(departmentName);
+    }
 }

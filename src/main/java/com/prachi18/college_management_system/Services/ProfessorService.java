@@ -4,6 +4,7 @@ import com.prachi18.college_management_system.DTO.ProfessorRequestDTO;
 import com.prachi18.college_management_system.DTO.ProfessorResponseDTO;
 import com.prachi18.college_management_system.Entities.Department;
 import com.prachi18.college_management_system.Entities.Professor;
+import com.prachi18.college_management_system.Entities.Subject;
 import com.prachi18.college_management_system.Exceptions.ResourceNotFoundException;
 import com.prachi18.college_management_system.Repositories.DepartmentRepository;
 import com.prachi18.college_management_system.Repositories.ProfessorRepository;
@@ -11,6 +12,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,7 +27,7 @@ public class ProfessorService {
     public ProfessorResponseDTO mapToResponseDTO(Professor professor){
         ProfessorResponseDTO dto= modelMapper.map(professor, ProfessorResponseDTO.class);
         if(professor.getDepartment()!=null){
-            dto.setDeptName(professor.getDepartment().getName());
+            dto.setDeptName(professor.getDepartment().getDepartmentName());
         }
         dto.setSubjectCount(
                 professor.getSubjects()==null?0:professor.getSubjects().size()
@@ -63,5 +65,15 @@ public class ProfessorService {
         Professor professor= professorRepository.findById(id)
                 .orElseThrow(()-> new ResourceNotFoundException("Professor with id "+id+" not found"));
         professorRepository.delete(professor);
+    }
+
+    @Transactional
+    public List<ProfessorResponseDTO> findByProfNameContainingIgnoreCase(String profName) {
+        List<Professor> professors= professorRepository.findByProfNameContainingIgnoreCase(profName);
+        if(professors.isEmpty()){ throw new ResourceNotFoundException("Subject with name "+profName+" not found");}
+        return professors.stream()
+                .map(this::mapToResponseDTO)
+                .toList();
+
     }
 }

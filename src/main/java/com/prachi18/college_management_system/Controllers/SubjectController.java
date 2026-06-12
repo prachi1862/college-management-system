@@ -51,4 +51,16 @@ public class SubjectController {
     public List<StudentResponseDTO> getStudentsBySubjectId(@PathVariable Long id){
       return subjectService.getStudentsBySubjectId(id);
     }
+
+    @Operation(summary = "get subject by subject name")
+    @GetMapping("/subjectName")
+    public List<SubjectResponseDTO> findBySubjectNameContainingIgnoreCase(@RequestParam String subjectName){
+        return subjectService.findBySubjectNameContainingIgnoreCase(subjectName);
+    }
+
+    @Operation(summary = "find by professor id")
+    @GetMapping("/professor/{professorId}")
+    public List<SubjectResponseDTO> findByProfessorId(@PathVariable Long professorId){
+        return subjectService.findByProfessorId(professorId);
+    }
 }

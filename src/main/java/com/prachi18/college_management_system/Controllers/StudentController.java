@@ -70,4 +70,16 @@ public class StudentController {
     public StudentResponseDTO updateStudentById(@Valid @RequestBody StudentRequestDTO dto, @PathVariable Long id){
       return studentService.updateStudent(id, dto);
     }
+
+    @Operation(summary = "search students by first name")
+    @GetMapping("/search")
+    public List<StudentResponseDTO> findByFirstName(@RequestParam String firstName){
+        return studentService.findByFirstNameContainingIgnoreCase(firstName);
+    }
+
+    @Operation(summary = "find student by department id")
+    @GetMapping("/department/{departmentId}")
+    public List<StudentResponseDTO> findByDepartmentId(@PathVariable Long departmentId){
+        return studentService.findByDepartmentId(departmentId);
+    }
 }
