@@ -17,6 +17,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -37,9 +38,27 @@ public class SubjectService {
         return dto;
     }
 
+    private StudentResponseDTO mapStudentToResponse(Student student){
+        StudentResponseDTO dto = new StudentResponseDTO();
+
+        dto.setId(student.getId());
+        dto.setFirstName(student.getFirstName());
+        dto.setLastName(student.getLastName());
+
+        if(student.getDepartment() != null){
+            dto.setDepartmentName(
+                    student.getDepartment().getDepartmentName()
+            );
+        }
+
+        return dto;
+    }
+
     @Transactional
     public SubjectResponseDTO createSubject(SubjectRequestDTO dto) {
-        Subject subject = modelMapper.map(dto, Subject.class);
+//        Subject subject = modelMapper.map(dto, Subject.class);
+        Subject subject = new Subject();
+        subject.setSubjectName(dto.getSubjectName());
         Professor professor = professorRepository.findById(dto.getProfessorId())
                 .orElseThrow(()-> new ResourceNotFoundException("Professor with id "+dto.getProfessorId()+" is not fpund"));
         subject.setProfessor(professor);
@@ -73,18 +92,9 @@ public class SubjectService {
     public List<StudentResponseDTO> getStudentsBySubjectId(Long id) {
         Subject subject= subjectRepository.findById(id)
                 .orElseThrow(()-> new ResourceNotFoundException("Subject with id "+id+" not found"));
-        List<Student> students = subject.getStudents();
-        return students.stream()
-                .map(
-                        student -> {
-                            StudentResponseDTO dto= modelMapper.map(student, StudentResponseDTO.class);
-
-                            if(student.getDepartment()!=null){
-                                dto.setDepartmentName(student.getDepartment().getDepartmentName());
-                            }
-                            return dto;
-                        }
-                )
+        return subject.getStudents()
+                .stream()
+                .map(this::mapStudentToResponse)
                 .toList();
     }
 

@@ -37,7 +37,9 @@ public class ProfessorService {
 
     @Transactional
     public ProfessorResponseDTO createProfessor(ProfessorRequestDTO dto) {
-        Professor professor= modelMapper.map(dto, Professor.class);
+//        Professor professor= modelMapper.map(dto, Professor.class);
+        Professor professor = new Professor();
+        professor.setProfName(dto.getProfName());
         Department department= departmentRepository.findById(dto.getDeptId())
                 .orElseThrow(() -> new ResourceNotFoundException("Department not found"));
         professor.setDepartment(department);

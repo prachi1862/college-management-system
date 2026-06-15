@@ -26,10 +26,6 @@ public class Student extends BaseEntity {
     @JsonIgnore
     private Department department;
 
-    @OneToOne(cascade= CascadeType.ALL)
-    @JoinColumn(name="admission_id")
-    private AdmissionRecord admissionRecord;
-
     @ManyToMany
     private List<Subject> subjects= new ArrayList<>();
 }

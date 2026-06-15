@@ -29,7 +29,12 @@ public class StudentService {
     private final ModelMapper modelMapper;
 
     public StudentResponseDTO mapToResponse(Student student){
-        StudentResponseDTO dto= modelMapper.map(student,StudentResponseDTO.class);
+        StudentResponseDTO dto= new StudentResponseDTO();
+
+        dto.setId(student.getId());
+        dto.setFirstName(student.getFirstName());
+        dto.setLastName(student.getLastName());
+
         if (student.getDepartment() != null) {
             dto.setDepartmentName(
                     student.getDepartment().getDepartmentName()
@@ -41,7 +46,12 @@ public class StudentService {
     @Transactional
     public StudentResponseDTO createStudent(StudentRequestDTO dto) {
 
-        Student student= modelMapper.map(dto, Student.class);
+//        Student student= modelMapper.map(dto, Student.class);
+        Student student = new Student();
+
+        student.setFirstName(dto.getFirstName());
+        student.setLastName(dto.getLastName());
+
         Department department = departmentRepository.findById(dto.getDepartmentId())
                 .orElseThrow(()->new ResourceNotFoundException("Department not found with id: " + dto.getDepartmentId()));
         student.setDepartment(department);
