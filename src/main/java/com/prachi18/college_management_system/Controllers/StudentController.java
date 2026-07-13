@@ -1,5 +1,6 @@
 package com.prachi18.college_management_system.Controllers;
 
+import com.prachi18.college_management_system.Advices.ApiResponse;
 import com.prachi18.college_management_system.DTO.StudentRequestDTO;
 import com.prachi18.college_management_system.DTO.StudentResponseDTO;
 import com.prachi18.college_management_system.DTO.SubjectResponseDTO;
@@ -29,57 +30,59 @@ public class StudentController {
 
     @Operation(summary = "add a new student")
     @PostMapping
-    public StudentResponseDTO addStudent(@Valid @RequestBody StudentRequestDTO dto){
-        return studentService.createStudent(dto);
+    public ApiResponse<StudentResponseDTO> addStudent(@Valid @RequestBody StudentRequestDTO dto){
+        return new ApiResponse<>(studentService.createStudent(dto));
     }
 
     @Operation(summary = "get student by id")
     @GetMapping("/{id}")
-    public StudentResponseDTO getStudentById(@PathVariable Long id){
-        return studentService.getStudentById(id);
+    public ApiResponse<StudentResponseDTO> getStudentById(@PathVariable Long id){
+        return new ApiResponse<>(studentService.getStudentById(id));
     }
 
     @Operation(summary = "get all students")
     @GetMapping
-    public List<StudentResponseDTO> getAllStudents(@RequestParam(defaultValue = "id") String sortBy,
+    public ApiResponse<List<StudentResponseDTO>> getAllStudents(@RequestParam(defaultValue = "id") String sortBy,
                                                    @RequestParam (defaultValue ="0") int page){
         Pageable pageable= PageRequest.of(page,PAGE_SIZE, Sort.by(Sort.Direction.ASC, sortBy));
-        return studentService.getAllStudents(pageable);
+        return new ApiResponse<> (studentService.getAllStudents(pageable));
     }
 
     @Operation(summary = "delete student by id")
     @DeleteMapping("/{id}")
-    public void deleteStudentById(@PathVariable Long id){
+    public ApiResponse<String> deleteStudentById(@PathVariable Long id){
         studentService.deleteStudentById(id);
+        return new ApiResponse<>("Deleted student by id successfully");
     }
 
     @Operation(summary = "enroll student in a subject")
     @PostMapping("/{studentId}/subject/{subjectId}")
-    public void enrollStudent(@PathVariable Long studentId , @PathVariable Long subjectId){
+    public ApiResponse<String > enrollStudent(@PathVariable Long studentId , @PathVariable Long subjectId){
         studentService.enrollStudentInSubject(studentId, subjectId);
+        return new ApiResponse<>("Student enrolled successfully");
     }
 
     @Operation(summary = "get all subjects a student is enrolled in")
     @GetMapping("/{studentId}/subjects")
-    public List<SubjectResponseDTO> getStudentSubjects(@PathVariable Long studentId){
-      return studentService.getStudentSubjects(studentId);
+    public ApiResponse<List<SubjectResponseDTO>> getStudentSubjects(@PathVariable Long studentId){
+      return new ApiResponse<> (studentService.getStudentSubjects(studentId));
     }
 
     @Operation(summary = "update student by id")
     @PutMapping("/{id}")
-    public StudentResponseDTO updateStudentById(@Valid @RequestBody StudentRequestDTO dto, @PathVariable Long id){
-      return studentService.updateStudent(id, dto);
+    public ApiResponse<StudentResponseDTO> updateStudentById(@Valid @RequestBody StudentRequestDTO dto, @PathVariable Long id){
+      return new ApiResponse<> (studentService.updateStudent(id, dto));
     }
 
     @Operation(summary = "search students by first name")
     @GetMapping("/search")
-    public List<StudentResponseDTO> findByFirstName(@RequestParam String firstName){
-        return studentService.findByFirstNameContainingIgnoreCase(firstName);
+    public ApiResponse<List<StudentResponseDTO>> findByFirstName(@RequestParam String firstName){
+        return new ApiResponse<> (studentService.findByFirstNameContainingIgnoreCase(firstName));
     }
 
     @Operation(summary = "find student by department id")
     @GetMapping("/department/{departmentId}")
-    public List<StudentResponseDTO> findByDepartmentId(@PathVariable Long departmentId){
-        return studentService.findByDepartmentId(departmentId);
+    public ApiResponse<List<StudentResponseDTO>> findByDepartmentId(@PathVariable Long departmentId){
+        return new ApiResponse<>(studentService.findByDepartmentId(departmentId));
     }
 }

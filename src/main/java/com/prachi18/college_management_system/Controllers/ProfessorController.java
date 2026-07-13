@@ -2,9 +2,9 @@ package com.prachi18.college_management_system.Controllers;
 
 import com.prachi18.college_management_system.DTO.ProfessorRequestDTO;
 import com.prachi18.college_management_system.DTO.ProfessorResponseDTO;
-import com.prachi18.college_management_system.Entities.Professor;
 import com.prachi18.college_management_system.Services.ProfessorService;
 import io.swagger.v3.oas.annotations.Operation;
+import com.prachi18.college_management_system.Advices.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -23,33 +23,34 @@ public class ProfessorController {
 
     @Operation(summary = "create a new professor")
     @PostMapping
-    public ProfessorResponseDTO save(@Valid @RequestBody ProfessorRequestDTO dto) {
-        return professorService.createProfessor(dto);
+    public ApiResponse<ProfessorResponseDTO> save(@Valid @RequestBody ProfessorRequestDTO dto) {
+        return new ApiResponse<>(professorService.createProfessor(dto));
     }
 
     @Operation(summary = "get professor by id")
     @GetMapping("/{id}")
-    public ProfessorResponseDTO getProfessorById(@PathVariable Long id){
-        return professorService.getProfessorById(id);
+    public ApiResponse<ProfessorResponseDTO> getProfessorById(@PathVariable Long id){
+        return new ApiResponse<>(professorService.getProfessorById(id));
     }
 
     @Operation(summary = "get all professors")
     @GetMapping
-    public List<ProfessorResponseDTO> getAllProfessors(@RequestParam(defaultValue = "id") String sortBy,
+    public ApiResponse<List<ProfessorResponseDTO>> getAllProfessors(@RequestParam(defaultValue = "id") String sortBy,
                                                        @RequestParam(defaultValue = "0") int page){
         Pageable pageable = PageRequest.of(page, PAGE_SIZE,  Sort.by(Sort.Direction.ASC, sortBy));
-        return professorService.getAllProfessors(pageable);
+        return new ApiResponse<>(professorService.getAllProfessors(pageable));
     }
 
     @Operation(summary = "delete professor by id")
     @DeleteMapping("/{id}")
-    public void deleteProfessorById(@PathVariable Long id){
+    public ApiResponse<String> deleteProfessorById(@PathVariable Long id){
         professorService.deleteProfessorById(id);
+        return new ApiResponse<>("delete professor successfully");
     }
 
     @Operation(summary = "find by professor name")
     @GetMapping("/profName")
-    public List<ProfessorResponseDTO> findByProfName(@RequestParam String profName){
-        return professorService.findByProfNameContainingIgnoreCase(profName);
+    public ApiResponse<List<ProfessorResponseDTO>> findByProfName(@RequestParam String profName){
+        return new ApiResponse<>(professorService.findByProfNameContainingIgnoreCase(profName));
     }
 }
