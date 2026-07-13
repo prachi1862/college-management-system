@@ -1,6 +1,5 @@
 package com.prachi18.college_management_system.Repositories;
 
-import com.prachi18.college_management_system.DTO.StudentResponseDTO;
 import com.prachi18.college_management_system.Entities.Student;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;

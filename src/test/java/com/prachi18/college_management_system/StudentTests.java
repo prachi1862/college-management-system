@@ -7,7 +7,6 @@ import com.prachi18.college_management_system.Repositories.*;
 import com.prachi18.college_management_system.Services.StudentService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,9 +20,6 @@ public class StudentTests {
     StudentRepository studentRepository;
 
     @Autowired
-    AdmissionRecordRepository admissionRecordRepository;
-
-    @Autowired
     DepartmentRepository departmentRepository;
 
     @Autowired
@@ -35,30 +31,11 @@ public class StudentTests {
     @Autowired
     StudentService studentService;
 
-    @Test
-    public void createStudent(){
-        AdmissionRecord admissionRecord = AdmissionRecord.builder()
-                .fees(80000)
-                .build();
-
-        Student student = Student.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .admissionRecord(admissionRecord)
-                .build();
-
-        var savedStudent = studentRepository.save(student);
-        System.out.println(savedStudent);
-        System.out.println(admissionRecordRepository.count());
-        studentRepository.delete(savedStudent);
-        System.out.println(admissionRecordRepository.count());
-
-    }
 
     @Test
     public void saveStudentInDepartment(){
         Department department = Department.builder()
-                .name("CSE")
+                .departmentName("CSE")
                 .deptCode("1111")
                 .hodName("Charu Gaur")
                 .build();
@@ -71,14 +48,14 @@ public class StudentTests {
         var savedStudent = studentRepository.save(student);
         System.out.println(savedStudent);
 
-        System.out.println(savedStudent.getDepartment().getName());
+        System.out.println(savedStudent.getDepartment().getDepartmentName());
     }
 
     @Test
     public void saveMultipleStudentsInSameDepartment(){
 
         Department department = Department.builder()
-                .name("Music")
+                .departmentName("Music")
                 .deptCode("9999")
                 .hodName("kiwiii")
                 .build();
@@ -100,8 +77,8 @@ public class StudentTests {
 
         department.setStudents(List.of(savedStudent2,savedStudent1));
         System.out.println(savedStudent1.getFirstName());
-        System.out.println(savedStudent2.getDepartment().getName());
-        System.out.println(savedStudent1.getDepartment().getName());
+        System.out.println(savedStudent2.getDepartment().getDepartmentName());
+        System.out.println(savedStudent1.getDepartment().getDepartmentName());
         System.out.println(department.getStudents().get(0).getFirstName());
         System.out.println(department.getStudents().get(1).getFirstName());
     }
@@ -125,7 +102,7 @@ public class StudentTests {
     @Test
     public void createStudentWithDepartment(){
         Department department = Department.builder()
-                .name("ECE")
+                .departmentName("ECE")
                 .deptCode("6969")
                 .hodName("Lily")
                 .build();
@@ -146,7 +123,7 @@ public class StudentTests {
     public void getStudentById(){
 
         Department department = Department.builder()
-                .name("ECE")
+                .departmentName("ECE")
                 .deptCode("6969")
                 .hodName("Lily")
                 .build();

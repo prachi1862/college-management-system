@@ -3,7 +3,6 @@ package com.prachi18.college_management_system.DTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.validator.constraints.Length;
 
 @Getter
 @Setter

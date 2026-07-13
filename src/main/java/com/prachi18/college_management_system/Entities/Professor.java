@@ -2,7 +2,6 @@ package com.prachi18.college_management_system.Entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.apache.catalina.User;
 
 import java.util.List;
 
