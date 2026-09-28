@@ -1,10 +1,12 @@
 package com.prachi18.college_management_system.Services;
 
 import com.prachi18.college_management_system.DTO.LoginRequestDTO;
+import com.prachi18.college_management_system.DTO.LoginResponseDTO;
 import com.prachi18.college_management_system.DTO.SignUpRequestDto;
 import com.prachi18.college_management_system.DTO.SignUpResponseDto;
 import com.prachi18.college_management_system.Entities.User;
 import com.prachi18.college_management_system.Enums.Role;
+import com.prachi18.college_management_system.Exceptions.ResourceNotFoundException;
 import com.prachi18.college_management_system.Repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -20,14 +22,19 @@ public class AuthService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public void login(LoginRequestDTO request) {
+    public String login(LoginRequestDTO request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
                         request.getPassword()
                 )
         );
+        User user= userRepository.findByEmail(request.getEmail())
+                .orElseThrow(()-> new ResourceNotFoundException("User not found"));
+
+        return jwtService.generateJwtToken(user);
     }
 
     public SignUpResponseDto signUp(SignUpRequestDto request) {
