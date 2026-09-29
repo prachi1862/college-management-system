@@ -6,14 +6,17 @@ import com.prachi18.college_management_system.Services.CustomUserDetailsService;
 import com.prachi18.college_management_system.Services.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -29,16 +32,23 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        final String requestHeaderToken = request.getHeader("Authorization");
+        Cookie[] cookies = request.getCookies();
 
-        if (requestHeaderToken == null ||
-                !requestHeaderToken.startsWith("Bearer ")) {
+        String token = null;
 
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("token")) {
+                    token = cookie.getValue();
+                    log.info("JWT cookie found");
+                    break;
+                }
+            }
+        }
+        if (token == null) {
             filterChain.doFilter(request, response);
             return;
         }
-
-        String token = requestHeaderToken.split("Bearer ")[1];
 
        try {
            long userId = jwtService.getUserIdFromJwtToken(token);
