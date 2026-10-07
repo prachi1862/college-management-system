@@ -66,6 +66,20 @@ public class GlobalExceptionHandler {
         return buildApiResponse(apiError);
 
     }
+
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    public ResponseEntity<ApiResponse<?>> handleInvalidRefreshTokenException(
+            InvalidRefreshTokenException e) {
+
+        log.warn("Refresh token validation failed: {}", e.getMessage());
+
+        ApiError apiError = ApiError.builder()
+                .status(HttpStatus.UNAUTHORIZED)
+                .message(e.getMessage())
+                .build();
+
+        return buildApiResponse(apiError);
+    }
         private ResponseEntity<ApiResponse<?>> buildApiResponse(ApiError apiError) {
         return new ResponseEntity<>(new ApiResponse<>(apiError), apiError.getStatus());
     }

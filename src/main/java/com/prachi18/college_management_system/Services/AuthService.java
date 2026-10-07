@@ -1,12 +1,11 @@
 package com.prachi18.college_management_system.Services;
 
-import com.prachi18.college_management_system.DTO.LoginRequestDTO;
-import com.prachi18.college_management_system.DTO.LoginResponseDTO;
-import com.prachi18.college_management_system.DTO.SignUpRequestDto;
-import com.prachi18.college_management_system.DTO.SignUpResponseDto;
+import com.prachi18.college_management_system.DTO.*;
+import com.prachi18.college_management_system.Entities.RefreshToken;
 import com.prachi18.college_management_system.Entities.User;
 import com.prachi18.college_management_system.Enums.Role;
 import com.prachi18.college_management_system.Exceptions.ResourceNotFoundException;
+import com.prachi18.college_management_system.Repositories.RefreshTokenRepository;
 import com.prachi18.college_management_system.Repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -14,6 +13,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -23,18 +24,29 @@ public class AuthService {
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    public String login(LoginRequestDTO request) {
+    public LoginTokens login(LoginRequestDTO loginRequestDTO) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
+                        loginRequestDTO.getEmail(),
+                        loginRequestDTO.getPassword()
                 )
         );
-        User user= userRepository.findByEmail(request.getEmail())
+        User user= userRepository.findByEmail(loginRequestDTO.getEmail())
                 .orElseThrow(()-> new ResourceNotFoundException("User not found"));
 
-        return jwtService.generateJwtToken(user);
+        String accessToken= jwtService.generateAccessToken(user);
+        String refreshToken= jwtService.generateRefreshToken(user);
+        String refreshTokenHash= jwtService.hashRefreshToken(refreshToken);
+        RefreshToken refreshTokenEntity= RefreshToken.builder()
+                .tokenHash(refreshTokenHash)
+                .user(user)
+                .expiresAt(LocalDateTime.now().plusMonths(6))
+                .revoked(false)
+                .build();
+        refreshTokenRepository.save(refreshTokenEntity);
+        return new LoginTokens(accessToken, refreshToken);
     }
 
     public SignUpResponseDto signUp(SignUpRequestDto request) {

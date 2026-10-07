@@ -65,7 +65,6 @@ public class ProfessorInvitationService {
 
         invitation.setUsed(true);
         userRepository.save(professor);
+        professorInvitationRepository.save(invitation);
     }
-
-
 }
