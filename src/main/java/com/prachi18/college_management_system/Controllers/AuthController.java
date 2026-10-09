@@ -15,7 +15,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -34,17 +35,27 @@ public class AuthController {
 
      @PostMapping("/login")
      public ApiResponse<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginDto, HttpServletResponse response ){
-          LoginTokens token= authService.login(loginDto);
-          Cookie accessCookie= new Cookie("accessToken", token.getAccessToken());
-          accessCookie.setHttpOnly(true);
-          accessCookie.setPath("/");
 
-          Cookie refreshCookie =new Cookie("refreshToken", token.getRefreshToken());
-          refreshCookie.setHttpOnly(true);
-          refreshCookie.setPath("/");
+         LoginTokens token = authService.login(loginDto);
 
-          response.addCookie(accessCookie);
-          response.addCookie(refreshCookie);
+         ResponseCookie accessCookie = ResponseCookie.from(
+                         "accessToken", token.getAccessToken())
+                 .httpOnly(true)
+                 .secure(false)
+                 .path("/")
+                 .sameSite("Lax")
+                 .build();
+
+         ResponseCookie refreshCookie = ResponseCookie.from(
+                         "refreshToken", token.getRefreshToken())
+                 .httpOnly(true)
+                 .secure(false)
+                 .path("/")
+                 .sameSite("Lax")
+                 .build();
+
+         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
           return new ApiResponse<>(new LoginResponseDTO("login successful"));
      }
@@ -79,7 +90,7 @@ public class AuthController {
                  .filter(c -> c.getName().equals("refreshToken"))
                  .findFirst()
                  .map(Cookie::getValue)
-                 .orElseThrow(() -> new RuntimeException("refreshToken not found in cookies"));
+                 .orElseThrow(() -> new InvalidRefreshTokenException("refreshToken not found in cookies"));
 
         String refreshTokenHash = jwtService.hashRefreshToken(refreshToken);
 
@@ -111,17 +122,66 @@ public class AuthController {
 
         refreshTokenRepository.save(newRefreshTokenEntity);
         String accessToken= jwtService.generateAccessToken(user);
-        Cookie accessCookie = new Cookie("accessToken", accessToken);
-        accessCookie.setHttpOnly(true);
-        accessCookie.setPath("/");
-        response.addCookie(accessCookie);
+        ResponseCookie accessCookie = ResponseCookie.from(
+                        "accessToken", accessToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .sameSite("Lax")
+                .build();
 
-        Cookie refreshCookie = new Cookie("refreshToken", newRefreshToken);
-        refreshCookie.setHttpOnly(true);
-        refreshCookie.setPath("/");
+        ResponseCookie refreshCookie = ResponseCookie.from(
+                        "refreshToken", newRefreshToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .sameSite("Lax")
+                .build();
 
-        response.addCookie(refreshCookie);
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
         return new ApiResponse<>("Token refreshed successfully");
+    }
+
+    @PostMapping("/logout")
+    public ApiResponse<String> logout(
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        Cookie[] cookies = request.getCookies();
+        String refreshToken = null;
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        authService.logOut(refreshToken);
+
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", "")
+                .httpOnly(true)
+                .secure(false) // Set true in HTTPS production
+                .path("/")
+                .sameSite("Lax")
+                .maxAge(0)
+                .build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .sameSite("Lax")
+                .maxAge(0)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+        return new ApiResponse<>("Logout successful");
     }
 }

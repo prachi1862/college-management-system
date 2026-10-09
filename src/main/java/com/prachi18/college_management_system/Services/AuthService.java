@@ -60,4 +60,21 @@ public class AuthService {
         User savedUser= userRepository.save(toBeCreatedUser);
         return modelMapper.map(savedUser,SignUpResponseDto.class);
     }
+
+    public void logOut(String refreshToken) {
+        if (refreshToken == null || refreshToken.isBlank()) {
+            return;
+        }
+
+        String tokenHash = jwtService.hashRefreshToken(refreshToken);
+
+        refreshTokenRepository.findByTokenHash(tokenHash)
+                .ifPresent(token -> {
+                    if (!token.isRevoked()) {
+                        token.setRevoked(true);
+                        refreshTokenRepository.save(token);
+                    }
+                });
+    }
+
 }
